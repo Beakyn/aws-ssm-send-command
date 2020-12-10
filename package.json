@@ -1,29 +1,22 @@
 {
-  "name": "aws-ssm-send-command",
+  "name": "aws-ssm-send-command-status-tracker",
+  "description": "Github Action helps you to execute remote bash command for AWS EC2 instance and to get the feedback/status from it.",
   "version": "1.0.0",
-  "description": "Github Actions for executing AWS SSM Send Command",
-  "main": "dist/index.js",
+  "main": "dist/index.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Beakyn/aws-ssm-send-command.git"
+  },
   "scripts": {
     "build": "node_modules/.bin/tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/peterkimzz/aws-ssm-send-command.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/peterkimzz/aws-ssm-send-command/issues"
-  },
-  "homepage": "https://github.com/peterkimzz/aws-ssm-send-command#readme",
   "dependencies": {
-    "@actions/core": "1.2.6",
-    "@actions/github": "4.0.0",
-    "aws-sdk": "2.784.0",
-    "node-fetch": "^2.6.1"
+    "@actions/core": "^1.2.6",
+    "aws-sdk": "^2.801.0"
   },
   "devDependencies": {
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "@types/node": "12.12.6"
   }
 }
