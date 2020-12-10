@@ -1,37 +1,35 @@
-name: "AWS SSM Send-Command"
-author: "Donghyun Peter Kim <peterkimzz69@gmail.com>"
+name: "SSM Command Status Tracker"
 
-branding:
-  icon: "arrow-up-right"
-  color: "orange"
-
-description: "Remote EC2 bash command execution."
+description: "Send SSM Command with status tracking"
 
 inputs:
-  aws-access-key-id:
-    required: true
+  access-key-id:
     description: "AWS access key id"
-  aws-secret-access-key:
     required: true
+  secret-access-key:
     description: "AWS secret access key"
-  aws-region:
     required: true
+  region:
     description: "Where EC2 instance is"
-  instance-ids:
     required: true
-    description: "AWS EC2 Instance id or ids"
+  instance-id:
+    description: "AWS EC2 Instance id"
+    required: true
   command:
-    required: false
     description: "Bash command you want to execute"
-    default: "echo $(date) >> logs.txt"
+    required: true
   working-directory:
-    required: false
     description: "Command execution location"
-    default: "/home/ubuntu"
-  comment:
-    required: false
-    description: "Comment for Send-Command"
-    default: "Executed by Github Actions"
+    required: true
+  timeout:
+    description: "Max time"
+    default: 600000
+  interval:
+    description: "Time between each run"
+    default: 10000
+outputs:
+  command-id:
+    description: "Command id for ssm send-command"
 
 runs:
   using: "node12"
