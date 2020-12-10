@@ -35,7 +35,7 @@ This action helps you to execute remote bash command for AWS EC2 instance and to
 
 ```yaml
 - name: AWS SSM Send-Command
-  uses: Beakyn/aws-ssm-send-command@main
+  uses: Beakyn/aws-ssm-send-command@master
   id: ssm
   with:
     aws-region: ${{ secrets.AWS_REGION }}
