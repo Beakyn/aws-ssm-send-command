@@ -26,13 +26,8 @@ const STATUS_SSM = {
     CANCELLING: 'Cancelling'
 };
 const checkStatus = (ssm, instanceId, commandId, interval = 10000) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('== Debug params');
-    console.log(`=== instance id ${instanceId}`);
-    console.log(`=== command id ${commandId}`);
-    console.log(`=== internval ${interval}`);
     yield sleep(interval);
     const response = yield get_data_by_command_id_1.default(ssm, instanceId, commandId);
-    console.log('Get data by command id end');
     console.log('response.Status => ', response.Status);
     let status = '';
     const failureStatus = [STATUS_SSM.CANCELLED, STATUS_SSM.TIMEOUT, STATUS_SSM.FAILED];

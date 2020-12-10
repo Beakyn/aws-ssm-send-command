@@ -34,9 +34,7 @@ try {
     let status = ''
     do {
       // Check status from command
-      console.log('Check Status Begin.');
       status = await checkStatus(ssm, instanceId, commandId, interval);
-      console.log('Check Status End');
     } while(status == '' && Date.now() - begin < timeout)    
     // Check failed status 
     if (status === '' || status === 'Failed') {
