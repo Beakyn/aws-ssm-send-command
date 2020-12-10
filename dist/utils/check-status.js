@@ -13,6 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const get_data_by_command_id_1 = __importDefault(require("./get-data-by-command-id"));
+const sleep = (interval) => new Promise((resolve) => {
+    setTimeout(resolve, interval);
+});
 const STATUS_SSM = {
     PENDING: 'Pending',
     IN_PROGRESS: 'InProgress',
@@ -23,29 +26,22 @@ const STATUS_SSM = {
     CANCELLING: 'Cancelling'
 };
 const checkStatus = (ssm, instanceId, commandId, interval = 10000) => __awaiter(void 0, void 0, void 0, function* () {
-    const begin = Date.now();
     console.log('== Debug params');
     console.log(`=== instance id ${instanceId}`);
     console.log(`=== command id ${commandId}`);
     console.log(`=== internval ${interval}`);
+    yield sleep(interval);
     const response = yield get_data_by_command_id_1.default(ssm, instanceId, commandId);
     console.log('Get data by command id end');
-    const end = Date.now();
-    const requestInterval = end - begin;
-    const missingInterval = interval - requestInterval;
-    return new Promise((resolve) => {
-        console.log('response.Status => ', response.Status);
-        let status = '';
-        const failureStatus = [STATUS_SSM.CANCELLED, STATUS_SSM.TIMEOUT, STATUS_SSM.FAILED];
-        if (response.Status == STATUS_SSM.SUCCESS) {
-            status = 'Success';
-        }
-        else if (failureStatus.indexOf(response.Status) !== -1) {
-            status = 'Failed';
-        }
-        setTimeout(() => {
-            resolve(status);
-        }, missingInterval < 0 ? 0 : missingInterval);
-    });
+    console.log('response.Status => ', response.Status);
+    let status = '';
+    const failureStatus = [STATUS_SSM.CANCELLED, STATUS_SSM.TIMEOUT, STATUS_SSM.FAILED];
+    if (response.Status == STATUS_SSM.SUCCESS) {
+        status = 'Success';
+    }
+    else if (failureStatus.indexOf(response.Status) !== -1) {
+        status = 'Failed';
+    }
+    return status;
 });
 exports.default = checkStatus;

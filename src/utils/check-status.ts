@@ -17,7 +17,6 @@ const STATUS_SSM = {
 };
 
 const checkStatus = async (ssm: SSM, instanceId: string, commandId: string, interval = 10000): Promise<string> => {
-  const begin = Date.now();
   console.log('== Debug params');
   console.log(`=== instance id ${instanceId}`);
   console.log(`=== command id ${commandId}`);
