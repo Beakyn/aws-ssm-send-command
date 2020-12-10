@@ -1,127 +1,53 @@
-# AWS SSM Send-Command
+# SSM Command Status Tracker action
 
-This action helps you to execute remote bash command for AWS EC2 instance **without SSH or other accessing**.
+This action helps you to execute remote bash command for AWS EC2 instance and to get the feedback/status from it.
 
-(This action internally uses AWS SSM Send-Command.)
-
-## Contents
-
-- [Requirements](#Requirements)
-- [Usage example](#Usage-example)
-- [Inputs](#Inputs)
-- [Outputs](#Outputs)
-- [Error Handling](#Error-Handling)
+(This action internally uses AWS SSM Send-Command and AWS SSM Check-Status.)
 
 ## Requirements
 
 1. To use this action, you have to set AWS IAM Role `AmazonSSMFullAccess` to your IAM user.
 2. Also your EC2 Instance must have IAM Role including `AmazonSSMFullAccess`.
 
-## Usage example
-
-```yml
-name: AWS SSM Send-Command Example
-
-on:
-  push:
-    branches: [master]
-
-jobs:
-  start:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: AWS SSM Send-Command
-        uses: peterkimzz/aws-ssm-send-command@master
-        id: ssm
-        with:
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          instance-ids: ${{ secrets.INSTANCE_ID }}
-
-          working-directory: /home/ubuntu/application
-          command: ls -al
-          comment: Hello world!
-
-      # Catch SSM outputs
-      - name: Get the outputs
-        run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
-```
-
 ## Inputs
 
-### `aws-access-key-id`
+`access-key-id`: AWS access key id. (**required**)
 
-**Required** Your IAM access key id.
+`secret-access-key`: AWS secret access key. (**required**)
 
-### `aws-secret-access-key`
+`region`: Where EC2 instance is. (**required**)
 
-**Required** Your IAM secret access key id.
+`instance-id`: AWS EC2 Instance id. (**required**)
 
-### `aws-region`
+`command`: Bash command you want to execute. (**required**)
 
-**Required** AWS EC2 Instance region. (e.g. us-west-1, us-northeast-1, ...)
+`working-directory`: Command execution location. (**required**)
 
-### `instance-ids`
+`timeout`: Max time running. (default: 600000 = 10 minutes)
 
-**Required** The id of AWS EC2 instance id (e.g i-xxx...)
-
-```yml
-# single instance
-instance-ids: i-0b1f8b18a1d450000
-
-# multiple instances (maxium 50 values)
-instance-ids: |
-  i-0b1f8b18a1d450000
-  i-0b1f8b18a1d450001
-  i-0b1f8b18a1d450002
-```
-
-### `command`
-
-Bash command you want to execute in a EC2 instance.
-
-```yml
-# default
-command: echo $(date) >> logs.txt
-
-# restart your pm2 service
-command: pm2 restart 0
-
-# or execute shell script
-command: /bin/sh restart.sh
-```
-
-### `working-directory`
-
-Where bash command executes.
-
-```yml
-# default
-working-directory: /home/ubuntu
-```
-
-### `comment`
-
-Logging message attached AWS SSM.
-
-```yml
-# default
-comment: Executed by Github Actions
-```
+`interval`: Time between each check status function. (default: 10000 = 10 seconds)
 
 ## Outputs
 
-### command-id
+`command-id`: Command id for ssm send-command.
 
-AWS SSM Run-Command id. (uuid type)
+## Example
 
-```bash
-# example
-6cf26b6f-b68f-4e20-b801-f6ee5318d000
+```yaml
+- name: AWS SSM Send-Command
+  uses: beakyn/aws-ssm-send-command-status-tracker@main
+  id: ssm
+  with:
+    aws-region: ${{ secrets.AWS_REGION }}
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    instance-id: ${{ secrets.INSTANCE_ID }}
+    working-directory: /home/ubuntu/application
+    command: echo "Hello World"
+
+    timeout: 100000
+    interval: 6000
 ```
 
 ## Error Handling
