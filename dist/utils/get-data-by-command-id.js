@@ -5,6 +5,7 @@ const getDataByCommandId = (ssm, instanceId, commandId) => new Promise((resolve,
         CommandId: commandId,
         InstanceId: instanceId,
     };
+    console.log('Get data by command id begin');
     ssm.getCommandInvocation(params, function (err, data) {
         if (err)
             reject(err);

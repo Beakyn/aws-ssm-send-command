@@ -14,7 +14,12 @@ const STATUS_SSM = {
 
 const checkStatus = async (ssm: SSM, instanceId: string, commandId: string, interval = 10000): Promise<string> => {
   const begin = Date.now();
+  console.log('== Debug params');
+  console.log(`=== instance id ${instanceId}`);
+  console.log(`=== command id ${commandId}`);
+  console.log(`=== internval ${interval}`);
   const response = await getDataByCommandId(ssm, instanceId, commandId);
+  console.log('Get data by command id end')
   const end = Date.now();
   const requestInterval = end - begin;
   const missingInterval = interval - requestInterval;

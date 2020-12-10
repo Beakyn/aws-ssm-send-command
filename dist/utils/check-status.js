@@ -24,7 +24,12 @@ const STATUS_SSM = {
 };
 const checkStatus = (ssm, instanceId, commandId, interval = 10000) => __awaiter(void 0, void 0, void 0, function* () {
     const begin = Date.now();
+    console.log('== Debug params');
+    console.log(`=== instance id ${instanceId}`);
+    console.log(`=== command id ${commandId}`);
+    console.log(`=== internval ${interval}`);
     const response = yield get_data_by_command_id_1.default(ssm, instanceId, commandId);
+    console.log('Get data by command id end');
     const end = Date.now();
     const requestInterval = end - begin;
     const missingInterval = interval - requestInterval;

@@ -54,7 +54,9 @@ try {
         let status = '';
         do {
             // Check status from command
+            console.log('Check Status Begin.');
             status = yield check_status_1.default(ssm, instanceId, commandId, interval);
+            console.log('Check Status End');
         } while (status == '' && Date.now() - begin < timeout);
         // Check failed status 
         if (status === '' || status === 'Failed') {
@@ -64,7 +66,11 @@ try {
         }
         console.log('SUCCESS');
         core.setOutput("command-id", commandId);
-    }));
+    }))
+        .catch((error) => {
+        console.error(error, error.stack);
+        core.setFailed(error);
+    });
 }
 catch (error) {
     console.error(error, error.stack);
