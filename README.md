@@ -34,7 +34,7 @@ This action helps you to execute remote bash command for AWS EC2 instance and to
 ## Example
 
 ```yaml
-- name: AWS SSM Send-Command
+- name: AWS SSM Send-Command Status Tracker
   uses: Beakyn/aws-ssm-send-command@master
   id: ssm
   with:
