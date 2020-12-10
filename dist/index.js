@@ -18,67 +18,55 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const core = __importStar(require("@actions/core"));
+const send_command_1 = __importDefault(require("./utils/send-command"));
+const check_status_1 = __importDefault(require("./utils/check-status"));
+const get_inputs_1 = __importDefault(require("./utils/get-inputs"));
 try {
-    const inputs = SanitizeInputs();
+    // Variables
+    const { accessKeyId, secretAccessKey, region, instanceId, command, workingDirectory, timeout, interval, } = get_inputs_1.default();
     // AWS Configure
     aws_sdk_1.default.config.update({
-        accessKeyId: inputs.accessKeyId,
-        secretAccessKey: inputs.secretAccessKey,
-        region: inputs.region,
+        accessKeyId,
+        secretAccessKey,
+        region,
     });
-    // Run Send Command
     const ssm = new aws_sdk_1.default.SSM();
-    ssm.sendCommand();
-    ssm.sendCommand({
-        InstanceIds: inputs.instanceIds,
-        DocumentName: inputs.documentName,
-        Comment: inputs.comment,
-        Parameters: {
-            workingDirectory: [inputs.workingDirectory],
-            commands: [inputs.command],
-        },
-    }, (err, data) => {
-        var _a;
-        if (err)
-            throw err;
-        console.log(data);
-        core.setOutput("command-id", (_a = data.Command) === null || _a === void 0 ? void 0 : _a.CommandId);
-    });
+    // Send command to SSM
+    send_command_1.default(ssm, instanceId, workingDirectory, command)
+        .then((commandId) => __awaiter(void 0, void 0, void 0, function* () {
+        // Retry check status function
+        const begin = Date.now();
+        let status = '';
+        do {
+            // Check status from command
+            status = yield check_status_1.default(ssm, instanceId, commandId, interval);
+        } while (status == '' && Date.now() - begin < timeout);
+        // Check failed status 
+        if (status === '' || status === 'Failed') {
+            console.error('ERROR FAILED');
+            core.setFailed("Failed command");
+            return;
+        }
+        console.log('SUCCESS');
+        core.setOutput("command-id", commandId);
+    }));
 }
-catch (err) {
-    console.error(err, err.stack);
-    core.setFailed(err);
-}
-function SanitizeInputs() {
-    // AWS
-    const _accessKeyId = core.getInput("aws-access-key-id", { required: true });
-    const _secretAccessKey = core.getInput("aws-secret-access-key", {
-        required: true,
-    });
-    const _region = core.getInput("aws-region", { required: true });
-    // SSM Send Command
-    const _instanceIds = core.getInput("instance-ids", { required: true });
-    const _command = core.getInput("command");
-    const _workingDirectory = core.getInput("working-directory");
-    const _comment = core.getInput("comment");
-    // customized not supported yet, will be updated soon.
-    const _documentName = "AWS-RunShellScript";
-    const _outputS3BucketName = "your-s3-bucket-name";
-    const _outputS3KeyPrefix = "your-s3-bucket-directory-name";
-    return {
-        accessKeyId: _accessKeyId,
-        secretAccessKey: _secretAccessKey,
-        region: _region,
-        instanceIds: _instanceIds.split(/\n/),
-        command: _command,
-        documentName: _documentName,
-        workingDirectory: _workingDirectory,
-        comment: _comment,
-    };
+catch (error) {
+    console.error(error, error.stack);
+    core.setFailed(error);
 }
